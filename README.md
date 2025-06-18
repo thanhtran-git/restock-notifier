@@ -1,54 +1,67 @@
-# React + TypeScript + Vite
+# VooStore.com Restock Notifier
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is an automatic restock notifier for voostore.com. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Monitor any number of products and sizes
+- Sends an email when your desired size is available
+- Checks stock every hour (cron job)
+- Easy configuration via JSON and environment variables
 
-## Expanding the ESLint configuration
+## Requirements
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js (recommended: >=18)
+- Gmail account for sending emails (or adjust the email setup for your provider)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Installation
+
+1. Clone the repository:
+   ```sh
+   git clone <repo-url>
+   cd project-y/backend
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Create a `.env` file in the `backend` directory with the following content:
+
+   ```env
+   EMAIL_USER=your.email@gmail.com
+   EMAIL_PASS=your_app_password
+   EMAIL_RECIPIENT=recipient@email.com
+   ```
+
+   > Tip: For Gmail, you need an app password if 2FA is enabled.
+
+4. Add products and sizes to `items.json`:
+   ```json
+   [
+     {
+       "url": "https://voostore.com/products/abzorb-2000-sneaker-in-still-water-blue-agate",
+       "targetSize": "10 (US M)",
+       "name": "NB Abzorb 2000"
+     }
+   ]
+   ```
+
+## Usage
+
+Start the notifier in the backend folder:
+
+```sh
+node index.js
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- On start, it checks immediately, then automatically every hour.
+- If your size is available, you will receive an email.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Customization
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- You can change the check frequency in `index.js` (cron syntax).
+- For other email providers, adjust the setup in `emailer.js`.
+
+## License
+
+MIT
