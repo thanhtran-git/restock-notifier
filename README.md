@@ -1,6 +1,6 @@
-# VooStore.com Restock Notifier
+[ Work in Progress ]
 
-This project is an automatic restock notifier for voostore.com. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
+This project is an automatic restock notifier for products on voostore.com. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
 
 ## Features
 
@@ -19,7 +19,7 @@ This project is an automatic restock notifier for voostore.com. It monitors sele
 1. Clone the repository:
    ```sh
    git clone <repo-url>
-   cd project-y/backend
+   cd voostore-restock-notifier/backend
    ```
 2. Install dependencies:
    ```sh
@@ -39,19 +39,19 @@ This project is an automatic restock notifier for voostore.com. It monitors sele
    ```json
    [
      {
-       "url": "https://voostore.com/products/abzorb-2000-sneaker-in-still-water-blue-agate",
+       "url": "https://voostore.com/products/x-jjjjound-gel-kayano-14-sneaker-in-white-black",
        "targetSize": "10 (US M)",
-       "name": "NB Abzorb 2000"
+       "name": "Asics Kayano 14 JJJJound"
      }
    ]
    ```
 
 ## Usage
 
-Start the notifier in the backend folder:
+Start the notifier:
 
 ```sh
-node index.js
+node server.js
 ```
 
 - On start, it checks immediately, then automatically every hour.
