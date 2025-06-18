@@ -1,11 +1,8 @@
 import dotenv from "dotenv";
-import fs from "fs";
 
 dotenv.config();
 
-export const ITEMS_TO_MONITOR = JSON.parse(
-  fs.readFileSync(new URL("./items.json", import.meta.url), "utf-8")
-);
+export const ITEMS_TO_MONITOR = JSON.parse(process.env.ITEMS_JSON);
 
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
