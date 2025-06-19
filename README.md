@@ -1,4 +1,4 @@
-[ Work in Progress ]
+[ Work in Progress. More shops will be added. ]
 
 This project is an automatic restock notifier for products on voostore.com. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
 
@@ -10,7 +10,7 @@ This project is an automatic restock notifier for products on voostore.com. It m
 
 ## Requirements
 
-- Node.js (recommended: >=18)
+- Node.js (recommended: >=23.6 for TS support)
 - Gmail account for sending emails (or adjust the email setup for your provider)
 
 ## Installation
@@ -18,11 +18,11 @@ This project is an automatic restock notifier for products on voostore.com. It m
 1. Clone the repository:
    ```sh
    git clone <repo-url>
-   cd voostore-restock-notifier/backend
+   cd restock-notifier
    ```
 2. Install dependencies:
    ```sh
-   npm install
+   npm i
    ```
 3. Create a `.env` file in the `backend` directory with the following content:
 
@@ -35,6 +35,7 @@ This project is an automatic restock notifier for products on voostore.com. It m
    > Tip: For Gmail, you need an app password if 2FA is enabled.
 
 4. Add products and sizes to `items.json`:
+
    ```json
    [
      {
@@ -45,12 +46,14 @@ This project is an automatic restock notifier for products on voostore.com. It m
    ]
    ```
 
+   > Tip: Add items.json to .gitignore and upload your items.json directly to the deployment platform.
+
 ## Usage
 
 Start the notifier:
 
 ```sh
-node server.js
+node server.ts
 ```
 
 - On start, it checks immediately, then in a set time interval.
@@ -58,8 +61,8 @@ node server.js
 
 ## Customization
 
-- You can change the check frequency in `index.js` (cron syntax).
-- For other email providers, adjust the setup in `emailer.js`.
+- You can change the check frequency in `index.ts` (cron syntax).
+- For other email providers, adjust the setup in `emailer.ts`.
 
 ## License
 
