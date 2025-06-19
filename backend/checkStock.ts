@@ -1,8 +1,18 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { sendEmail } from "./emailer.js";
+import { sendEmail } from "./emailer.ts";
 
-export async function checkStock({ url, targetSize, name }) {
+export type CheckStockParams = {
+  url: string;
+  targetSize: string;
+  name: string;
+};
+
+export async function checkStock({
+  url,
+  targetSize,
+  name,
+}: CheckStockParams): Promise<void> {
   try {
     const { data: html } = await axios.get(url, {
       headers: {
@@ -14,7 +24,7 @@ export async function checkStock({ url, targetSize, name }) {
     const sizeList = $('div[data-dropdown="list"] ul li');
 
     let found = false;
-    let sizes = [];
+    const sizes: string[] = [];
 
     sizeList.each((_, el) => {
       const input = $(el).find("input[type='radio']");
@@ -43,6 +53,9 @@ export async function checkStock({ url, targetSize, name }) {
       );
     }
   } catch (err) {
-    console.error(`❌ Error checking ${name}:`, err.message);
+    console.error(
+      `❌ Error checking ${name}:`,
+      err instanceof Error ? err.message : String(err)
+    );
   }
 }

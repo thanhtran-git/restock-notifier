@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAllItems } from "./backend/checkAllItems.js";
+import { checkAllItems } from "./backend/checkAllItems.ts";
 import cron from "node-cron";
 
 const app = express();
