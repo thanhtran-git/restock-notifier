@@ -7,7 +7,6 @@ This project is an automatic restock notifier for products on voostore.com. It m
 - Monitor any number of products and sizes
 - Sends an email when your desired size is available
 - Checks stock every hour (cron job)
-- Easy configuration via JSON and environment variables
 
 ## Requirements
 
@@ -54,7 +53,7 @@ Start the notifier:
 node server.js
 ```
 
-- On start, it checks immediately, then automatically every hour.
+- On start, it checks immediately, then in a set time interval.
 - If your size is available, you will receive an email.
 
 ## Customization
