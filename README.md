@@ -1,12 +1,11 @@
-[ Work in Progress. More shops will be added. ]
-
-This project is an automatic restock notifier for products on voostore.com. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
+This project is an automatic restock notifier for sold out products of some online shops. It monitors selected products and notifies you via email as soon as your desired size is back in stock.
 
 ## Features
 
-- Monitor any number of products and sizes
+- Monitor any number of products and your target size
 - Sends an email when your desired size is available
 - Checks stock every hour (cron job)
+- Supported shops: Overkillshop, VooStore, Solebox (soon)
 
 ## Requirements
 
@@ -41,12 +40,13 @@ This project is an automatic restock notifier for products on voostore.com. It m
      {
        "url": "https://voostore.com/products/x-jjjjound-gel-kayano-14-sneaker-in-white-black",
        "targetSize": "10 (US M)",
-       "name": "Asics Kayano 14 JJJJound"
+       "name": "Asics Kayano 14 JJJJound",
+       "shop": "Voostore"
      }
    ]
    ```
 
-   > Tip: Add items.json to .gitignore and upload your items.json directly to the deployment platform.
+   > Tip: For privacy, add items.json to .gitignore and upload your items.json directly to the deployment platform.
 
 ## Usage
 
