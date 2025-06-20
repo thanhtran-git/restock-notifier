@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { sendEmail } from "../emailer.ts";
+import { handleStockResult } from "../stockUtils.ts";
 import type { ItemToMonitor } from "../../types.ts";
 
 export async function checkStockVoostore(item: ItemToMonitor): Promise<void> {
@@ -32,21 +32,7 @@ export async function checkStockVoostore(item: ItemToMonitor): Promise<void> {
 
     console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizes);
-
-    if (found) {
-      const message = `👟 Your size ${targetSize} is back in stock for "${name}"!\n${url}`;
-      console.log(
-        `✅ Size ${targetSize} available for '${name}' in Voostore. Sending email...`
-      );
-      await sendEmail(`👟 In Stock: ${name}`, message);
-    } else {
-      console.log(
-        `❌ Size ${targetSize} still sold out for '${name}' in Voostore. 🕐 ${new Date().toLocaleString()}`
-      );
-    }
-    console.log(
-      `_________________________________________________________________________________________________\n`
-    );
+    await handleStockResult(found, targetSize, name, url, "Voostore");
   } catch (err) {
     console.error(
       `❌ Error checking ${name}:`,

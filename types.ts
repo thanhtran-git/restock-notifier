@@ -6,3 +6,11 @@ export interface ItemToMonitor {
   name: string;
   shop: Shop;
 }
+
+export type StockResultParams = {
+  found: boolean;
+  targetSize: string;
+  name: string;
+  url: string;
+  shop: string;
+};

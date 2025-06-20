@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { sendEmail } from "../emailer.ts";
+import { handleStockResult } from "../stockUtils.ts";
 import type { ItemToMonitor } from "../../types.ts";
 
 export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
@@ -69,19 +69,8 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
     });
 
     console.log(`🔍 Checking: ${name}`);
-    console.log("Available sizes:", sizeList);
-
-    if (found) {
-      const message = `👟 Your size ${targetSize} is back in stock for "${name}"!\n${url}`;
-      console.log(
-        `✅ Size ${targetSize} available for '${name}' in Overkill. Sending email...`
-      );
-      await sendEmail(`👟 In Stock: ${name}`, message);
-    } else {
-      console.log(
-        `❌ Size ${targetSize} still sold out for '${name}' in Overkill. 🕐 ${new Date().toLocaleString()}\n`
-      );
-    }
+    console.log("Sizes:", sizeList);
+    await handleStockResult(found, targetSize, name, url, "Overkill");
   } catch (err) {
     console.error(
       `❌ Error checking ${name}:`,
@@ -92,7 +81,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
       await browser.close();
     }
     console.log(
-      `_________________________________________________________________________________________________\n`
+      "_________________________________________________________________________________________________\n"
     );
   }
 }
