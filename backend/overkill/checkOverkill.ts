@@ -70,7 +70,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
 
     console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizeList);
-    await handleStockResult(found, targetSize, name, url, "Overkill");
+    await handleStockResult({ found, targetSize, name, url, shop: "Overkill" });
   } catch (err) {
     console.error(
       `❌ Error checking ${name}:`,

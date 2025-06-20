@@ -32,7 +32,7 @@ export async function checkStockVoostore(item: ItemToMonitor): Promise<void> {
 
     console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizes);
-    await handleStockResult(found, targetSize, name, url, "Voostore");
+    await handleStockResult({ found, targetSize, name, url, shop: "Voostore" });
   } catch (err) {
     console.error(
       `❌ Error checking ${name}:`,

@@ -1,13 +1,13 @@
-// backend/stockUtils.ts
 import { sendEmail } from "./emailer.ts";
+import type { StockResultParams } from "../types.ts";
 
-export async function handleStockResult(
-  found: boolean,
-  targetSize: string,
-  name: string,
-  url: string,
-  shop: string
-) {
+export async function handleStockResult({
+  found,
+  targetSize,
+  name,
+  url,
+  shop,
+}: StockResultParams) {
   if (found) {
     const message = `👟 Your size ${targetSize} is back in stock for "${name}"!\n${url}`;
     console.log(
