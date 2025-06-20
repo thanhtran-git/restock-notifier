@@ -80,8 +80,5 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
     if (browser) {
       await browser.close();
     }
-    console.log(
-      "_________________________________________________________________________________________________\n"
-    );
   }
 }
