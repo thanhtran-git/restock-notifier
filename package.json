@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npx puppeteer browsers install chrome && tsc -b && vite build",
+    "postinstall": "npx puppeteer browsers install chrome",
     "lint": "eslint .",
     "preview": "vite preview"
   },
