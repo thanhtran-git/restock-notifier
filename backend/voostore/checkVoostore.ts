@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { handleStockResult, logError } from "../stockUtils.ts";
+import { SHOP_NAME } from "../../types.ts";
 import type { ItemToMonitor } from "../../types.ts";
 
 export async function checkStockVoostore(item: ItemToMonitor): Promise<void> {
@@ -35,7 +36,13 @@ export async function checkStockVoostore(item: ItemToMonitor): Promise<void> {
 
     console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizes);
-    await handleStockResult({ found, targetSize, name, url, shop: "Voostore" });
+    await handleStockResult({
+      found,
+      targetSize,
+      name,
+      url,
+      shop: SHOP_NAME.Voostore,
+    });
   } catch (err) {
     logError(`checking ${name}`, err);
   }

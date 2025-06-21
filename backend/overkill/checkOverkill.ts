@@ -5,6 +5,7 @@ import {
   logError,
 } from "../stockUtils.ts";
 import type { ItemToMonitor } from "../../types.ts";
+import { SHOP_NAME } from "../../types.ts";
 
 export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
   const { url, targetSize, name } = item;
@@ -28,7 +29,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
       page,
       name,
       selector: "variant-picker",
-      shop: "Overkill",
+      shop: SHOP_NAME.Overkill,
     });
     if (!variantPickerExists) return;
 
@@ -80,7 +81,13 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
 
     console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizeList);
-    await handleStockResult({ found, targetSize, name, url, shop: "Overkill" });
+    await handleStockResult({
+      found,
+      targetSize,
+      name,
+      url,
+      shop: SHOP_NAME.Overkill,
+    });
   } catch (err) {
     logError(`checking ${name}`, err);
   } finally {
