@@ -16,7 +16,16 @@ try {
   process.exit(1);
 }
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    console.error(`❌ Fehlende Umgebungsvariable: ${name}`);
+    process.exit(1);
+  }
+  return value;
+}
+
 export { ITEMS_TO_MONITOR };
-export const EMAIL_USER: string | undefined = process.env.EMAIL_USER;
-export const EMAIL_PASS: string | undefined = process.env.EMAIL_PASS;
-export const RECIPIENT: string | undefined = process.env.EMAIL_RECIPIENT;
+export const EMAIL_USER: string = requireEnv("EMAIL_USER");
+export const EMAIL_PASS: string = requireEnv("EMAIL_PASS");
+export const RECIPIENT: string = requireEnv("EMAIL_RECIPIENT");
