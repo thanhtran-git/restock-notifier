@@ -30,7 +30,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
       return;
     }
 
-    await page.waitForSelector("variant-picker", { timeout: 3000 });
+    await page.waitForSelector("variant-picker", { timeout: 1000 });
 
     const sizeData = await page.evaluate(() => {
       const sizeLabels = document.querySelectorAll(
@@ -43,7 +43,15 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
         if (!sizeElement) return;
 
         const sizeText = sizeElement.textContent?.trim();
-        if (!sizeText || !/^\d{2}(?:[ .]?\d\/\d)?$/.test(sizeText)) return;
+        if (
+          !sizeText ||
+          !(
+            /^\d{2}(?:[ .]?\d\/\d)?$/.test(sizeText) ||
+            /^(s|m|l|xl|2xl)$/i.test(sizeText) ||
+            /^one size$/i.test(sizeText)
+          )
+        )
+          return;
 
         const inputId = label.getAttribute("for");
         if (!inputId) return;
@@ -62,7 +70,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
     let found = false;
 
     const sizeList = sizeData.map(({ size, isSoldOut }) => {
-      if (size === targetSize && !isSoldOut) {
+      if (size.toLowerCase() === targetSize.toLowerCase() && !isSoldOut) {
         found = true;
       }
       return `${size}${isSoldOut ? " (sold out)" : ""}`;
