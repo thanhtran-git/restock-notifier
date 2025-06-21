@@ -35,52 +35,38 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
 
     await page.waitForSelector("variant-picker", { timeout: 1000 });
 
-    const sizeData = await page.evaluate(() => {
+    const { sizes, found } = await page.evaluate((targetSize) => {
       const sizeLabels = document.querySelectorAll(
         "variant-picker label[data-eu]"
       );
-      const sizes: Array<{ size: string; isSoldOut: boolean }> = [];
+      const sizes: string[] = [];
+      let found = false;
 
       sizeLabels.forEach((label) => {
         const sizeElement = label.querySelector("span.js-value");
-        if (!sizeElement) return;
-
-        const sizeText = sizeElement.textContent?.trim();
-        if (
-          !sizeText ||
-          !(
-            /^\d{2}(?:[ .]?\d\/\d)?$/.test(sizeText) ||
-            /^(s|m|l|xl|2xl)$/i.test(sizeText) ||
-            /^one size$/i.test(sizeText)
-          )
-        )
-          return;
-
+        const sizeText = sizeElement?.textContent?.trim();
         const inputId = label.getAttribute("for");
-        if (!inputId) return;
+        const input = inputId && document.getElementById(inputId);
 
-        const input = document.getElementById(inputId);
-        if (!input) return;
+        if (!sizeText || !input) return;
 
         const isSoldOut = input.classList.contains("is-unavailable");
 
-        sizes.push({ size: sizeText, isSoldOut });
+        sizes.push(`${sizeText}${isSoldOut ? " (sold out)" : ""}`);
+
+        if (
+          sizeText.toLowerCase() === (targetSize as string).toLowerCase() &&
+          !isSoldOut
+        ) {
+          found = true;
+        }
       });
 
-      return sizes;
-    });
-
-    let found = false;
-
-    const sizeList = sizeData.map(({ size, isSoldOut }) => {
-      if (size.toLowerCase() === targetSize.toLowerCase() && !isSoldOut) {
-        found = true;
-      }
-      return `${size}${isSoldOut ? " (sold out)" : ""}`;
-    });
+      return { sizes, found };
+    }, targetSize);
 
     console.log(`🔍 Checking: ${name}`);
-    console.log("Sizes:", sizeList);
+    console.log("Sizes:", sizes);
     await handleStockResult({
       found,
       targetSize,
