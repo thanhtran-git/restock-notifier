@@ -1,5 +1,9 @@
 import puppeteer from "puppeteer";
-import { handleStockResult } from "../stockUtils.ts";
+import {
+  handleStockResult,
+  checkVariantPickerExists,
+  logError,
+} from "../stockUtils.ts";
 import type { ItemToMonitor } from "../../types.ts";
 
 export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
@@ -20,15 +24,13 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
 
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    const variantPickerExists = (await page.$("variant-picker")) !== null;
-
-    if (!variantPickerExists) {
-      console.log(`🔍 Checking: ${name}`);
-      console.log(
-        `❌ All sizes sold out for '${name}' in Overkill. 🕐 ${new Date().toLocaleString()}`
-      );
-      return;
-    }
+    const variantPickerExists = await checkVariantPickerExists({
+      page,
+      name,
+      selector: "variant-picker",
+      shop: "Overkill",
+    });
+    if (!variantPickerExists) return;
 
     await page.waitForSelector("variant-picker", { timeout: 1000 });
 
@@ -80,10 +82,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
     console.log("Sizes:", sizeList);
     await handleStockResult({ found, targetSize, name, url, shop: "Overkill" });
   } catch (err) {
-    console.error(
-      `❌ Error checking ${name}:`,
-      err instanceof Error ? err.message : String(err)
-    );
+    logError(`checking ${name}`, err);
   } finally {
     if (browser) {
       await browser.close();
