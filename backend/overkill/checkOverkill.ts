@@ -54,10 +54,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
 
         sizes.push(`${sizeText}${isSoldOut ? " (sold out)" : ""}`);
 
-        if (
-          sizeText.toLowerCase() === (targetSize as string).toLowerCase() &&
-          !isSoldOut
-        ) {
+        if (sizeText.toLowerCase() === targetSize.toLowerCase() && !isSoldOut) {
           found = true;
         }
       });
