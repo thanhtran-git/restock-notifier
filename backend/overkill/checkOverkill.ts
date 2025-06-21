@@ -43,7 +43,7 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
         if (!sizeElement) return;
 
         const sizeText = sizeElement.textContent?.trim();
-        if (!sizeText || !/^\d{2}(\.\d)?$/.test(sizeText)) return;
+        if (!sizeText || !/^\d{2}(?:[ .]?\d\/\d)?$/.test(sizeText)) return;
 
         const inputId = label.getAttribute("for");
         if (!inputId) return;
