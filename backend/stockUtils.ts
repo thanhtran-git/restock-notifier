@@ -1,5 +1,8 @@
 import { sendEmail } from "./emailer.ts";
-import type { StockResultParams } from "../types.ts";
+import type {
+  StockResultParams,
+  CheckVariantPickerExistsParams,
+} from "../types.ts";
 
 export async function handleStockResult({
   found,
@@ -22,4 +25,26 @@ export async function handleStockResult({
   console.log(
     `_________________________________________________________________________________________________\n`
   );
+}
+
+export async function checkVariantPickerExists({
+  page,
+  name,
+  selector = "variant-picker",
+  shop = "Overkill",
+}: CheckVariantPickerExistsParams): Promise<boolean> {
+  const exists = (await page.$(selector)) !== null;
+  if (!exists) {
+    console.log(`🔍 Checking: ${name}`);
+    console.log(
+      `❌ All sizes sold out for '${name}' in ${shop}. 🕐 ${new Date().toLocaleString()} \n
+      _________________________________________________________________________________________________`
+    );
+  }
+  return exists;
+}
+
+export function logError(context: string, err: unknown) {
+  const msg = err instanceof Error ? err.message : String(err);
+  console.error(`❌ Error in ${context}: ${msg}`);
 }

@@ -14,3 +14,10 @@ export type StockResultParams = {
   url: string;
   shop: string;
 };
+
+export interface CheckVariantPickerExistsParams {
+  page: import("puppeteer").Page;
+  name: string;
+  selector?: string;
+  shop?: string;
+}
