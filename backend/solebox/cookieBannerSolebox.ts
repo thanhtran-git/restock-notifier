@@ -4,19 +4,6 @@ export async function closeCookieBanner(page: Page): Promise<boolean> {
     return new Promise((res) => setTimeout(res, ms));
   }
   for (let attempt = 0; attempt < 5; attempt++) {
-    const declineLink = await page.$("a.cmpboxbtnno");
-    if (declineLink) {
-      console.log(
-        "Klicke Cookie-Banner-Link a.cmpboxbtnno im DOM (Versuch " +
-          (attempt + 1) +
-          ")"
-      );
-      await declineLink.click();
-      await sleep(5000);
-      const stillThere = await page.$("a.cmpboxbtnno");
-      if (!stillThere) return true;
-    }
-
     const closed = await page.evaluate(() => {
       function findAndClickInShadow(root: Element | ShadowRoot): boolean {
         if (!root) return false;
@@ -45,11 +32,11 @@ export async function closeCookieBanner(page: Page): Promise<boolean> {
           (attempt + 1) +
           ")"
       );
-      await sleep(2000);
+      await sleep(10000);
       const stillThere = await page.$("a.cmpboxbtnno");
       if (!stillThere) return true;
     }
-    await sleep(800);
+    await sleep(10000);
   }
   return false;
 }
