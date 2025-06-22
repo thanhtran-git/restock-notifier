@@ -90,4 +90,6 @@ export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
       await browser.close();
     }
   }
+  // Nach jedem Check mindestens 8 Sekunden warten
+  await new Promise((res) => setTimeout(res, 8000));
 }
