@@ -1,4 +1,5 @@
 import { closeCookieBanner } from "./cookieBannerSolebox.ts";
+import { closeCountryBanner } from "./countryBanner.ts";
 import puppeteer from "puppeteer";
 import { handleStockResult, logError } from "../stockUtils.ts";
 import { SHOP_NAME } from "../../types.ts";
@@ -23,6 +24,7 @@ export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
     await page.goto(url, { waitUntil: "networkidle2" });
     await new Promise((res) => setTimeout(res, 10000));
     await closeCookieBanner(page);
+    await closeCountryBanner(page);
     await page.waitForSelector("span.select-size", { timeout: 5000 });
 
     const selectSize = await page.$("span.select-size");
