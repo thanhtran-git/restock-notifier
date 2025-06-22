@@ -25,4 +25,5 @@ export interface CheckVariantPickerExistsParams {
 export const SHOP_NAME = {
   Voostore: "Voostore",
   Overkill: "Overkill",
+  Solebox: "Solebox",
 } as const;
