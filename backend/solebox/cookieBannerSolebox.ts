@@ -12,7 +12,7 @@ export async function closeCookieBanner(page: Page): Promise<boolean> {
           ")"
       );
       await declineLink.click();
-      await sleep(1000);
+      await sleep(5000);
       const stillThere = await page.$("a.cmpboxbtnno");
       if (!stillThere) return true;
     }
@@ -45,7 +45,7 @@ export async function closeCookieBanner(page: Page): Promise<boolean> {
           (attempt + 1) +
           ")"
       );
-      await sleep(1000);
+      await sleep(2000);
       const stillThere = await page.$("a.cmpboxbtnno");
       if (!stillThere) return true;
     }

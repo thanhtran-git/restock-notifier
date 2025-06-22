@@ -22,7 +22,7 @@ export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
     );
     await page.goto(url, { waitUntil: "networkidle2" });
     await closeCookieBanner(page);
-    await page.waitForSelector("span.select-size", { timeout: 5000 });
+    await page.waitForSelector("span.select-size", { timeout: 15000 });
 
     const selectSize = await page.$("span.select-size");
     if (selectSize) {
@@ -31,7 +31,7 @@ export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
         throw new Error("span.select-size ist nicht sichtbar/klickbar");
       }
       await selectSize.click();
-      await new Promise((res) => setTimeout(res, 2000));
+      await new Promise((res) => setTimeout(res, 15000));
     } else {
       throw new Error("span.select-size nicht gefunden oder nicht klickbar");
     }
