@@ -35,7 +35,6 @@ export async function checkVariantPickerExists({
 }: CheckVariantPickerExistsParams): Promise<boolean> {
   const exists = (await page.$(selector)) !== null;
   if (!exists) {
-    console.log(`🔍 Checking: ${name}`);
     console.log(
       `❌ All sizes sold out for '${name}' in ${shop}. 🕐 ${new Date().toLocaleString()} \n
       _________________________________________________________________________________________________`
