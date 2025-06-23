@@ -15,12 +15,12 @@ export async function checkStockSolebox(
   try {
     console.log(`🔍 Checking: ${name}`);
     page = await browser.newPage();
+    await page.setViewport({ width: 1920, height: 1080 });
     console.log("[Solebox] Tab geöffnet");
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     );
-    await page.goto(url, { waitUntil: "networkidle2" });
-    await new Promise((res) => setTimeout(res, 10000));
+    await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
     await closeCookieBanner(page);
     await closeCountryBanner(page);
     await page.waitForSelector("span.select-size", { timeout: 5000 });
