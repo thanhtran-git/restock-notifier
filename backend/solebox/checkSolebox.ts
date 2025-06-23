@@ -1,23 +1,21 @@
 import { closeCookieBanner } from "./cookieBannerSolebox.ts";
 import { closeCountryBanner } from "./countryBanner.ts";
-import puppeteer from "puppeteer";
+import { Browser } from "puppeteer";
 import { handleStockResult, logError } from "../stockUtils.ts";
 import { SHOP_NAME } from "../../types.ts";
 import type { ItemToMonitor } from "../../types.ts";
 
-export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
+export async function checkStockSolebox(
+  item: ItemToMonitor,
+  browser: Browser
+): Promise<void> {
   const { url, targetSize, name } = item;
-  let browser;
+  let page;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--start-maximized"],
-      // @ts-expect-error ignoreHTTPSErrors is not a valid option for puppeteer.launch
-      ignoreHTTPSErrors: true,
-    });
-
-    const page = await browser.newPage();
+    console.log(`🔍 Checking: ${name}`);
+    page = await browser.newPage();
+    console.log("[Solebox] Tab geöffnet");
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     );
@@ -88,8 +86,13 @@ export async function checkStockSolebox(item: ItemToMonitor): Promise<void> {
   } catch (err) {
     logError(`checking ${name}`, err);
   } finally {
-    if (browser) {
-      await browser.close();
+    if (page && !page.isClosed()) {
+      try {
+        await page.close();
+        console.log("[Solebox] Tab geschlossen");
+      } catch (closeErr) {
+        console.warn("Fehler beim Schließen der Seite:", closeErr);
+      }
     }
   }
   // Nach jedem Check mindestens 8 Sekunden warten

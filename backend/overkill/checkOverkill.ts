@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import { Browser } from "puppeteer";
 import {
   handleStockResult,
   checkVariantPickerExists,
@@ -7,22 +7,19 @@ import {
 import type { ItemToMonitor } from "../../types.ts";
 import { SHOP_NAME } from "../../types.ts";
 
-export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
+export async function checkStockOverkill(
+  item: ItemToMonitor,
+  browser: Browser
+): Promise<void> {
   const { url, targetSize, name } = item;
-  let browser;
+  let page;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-
+    console.log(`🔍 Checking: ${name}`);
+    page = await browser.newPage();
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     );
-
     await page.goto(url, { waitUntil: "networkidle2" });
 
     const variantPickerExists = await checkVariantPickerExists({
@@ -31,7 +28,10 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
       selector: "variant-picker",
       shop: SHOP_NAME.Overkill,
     });
-    if (!variantPickerExists) return;
+    if (!variantPickerExists) {
+      await page.close();
+      return;
+    }
 
     await page.waitForSelector("variant-picker", { timeout: 1000 });
 
@@ -62,7 +62,6 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
       return { sizes, found };
     }, targetSize);
 
-    console.log(`🔍 Checking: ${name}`);
     console.log("Sizes:", sizes);
     await handleStockResult({
       found,
@@ -74,8 +73,14 @@ export async function checkStockOverkill(item: ItemToMonitor): Promise<void> {
   } catch (err) {
     logError(`checking ${name}`, err);
   } finally {
-    if (browser) {
-      await browser.close();
+    // 3 Sekunden warten, bevor das Tab geschlossen wird
+    await new Promise((res) => setTimeout(res, 3000));
+    if (page && !page.isClosed()) {
+      try {
+        await page.close();
+      } catch (closeErr) {
+        console.warn("Fehler beim Schließen der Seite:", closeErr);
+      }
     }
   }
 }
