@@ -1,4 +1,5 @@
 import { Browser } from "puppeteer";
+import ora from "ora";
 import {
   handleStockResult,
   checkVariantPickerExists,
@@ -13,30 +14,34 @@ export async function checkStockOverkill(
 ): Promise<void> {
   const { url, targetSize, name } = item;
   let page;
+  const spinner = ora("\n[Overkill] Lade Produktseite...").start();
 
   try {
-    console.log(`🔍 Checking: ${name}`);
+    console.log(`\n🔍 Checking: ${name}`);
     page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
-    console.log("[Overkill] Tab geöffnet");
+    spinner.text = "[Overkill] Seite wird geladen...";
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     );
     await page.goto(url, { waitUntil: "networkidle2" });
+    await new Promise((res) => setTimeout(res, 3000));
+    spinner.text = "[Overkill] Warte auf Größenauswahl";
 
-    const variantPickerExists = await checkVariantPickerExists({
+    const { exists, logMsg } = await checkVariantPickerExists({
       page,
       name,
       selector: "variant-picker",
       shop: SHOP_NAME.Overkill,
     });
-    if (!variantPickerExists) {
+    await new Promise((res) => setTimeout(res, 3000));
+    if (!exists) {
+      spinner.fail(`[Overkill] ${logMsg || ""}`);
       await page.close();
       return;
     }
-
     await page.waitForSelector("variant-picker", { timeout: 1000 });
-
+    await new Promise((res) => setTimeout(res, 3000));
     const { sizes, found } = await page.evaluate((targetSize) => {
       const sizeLabels = document.querySelectorAll(
         "variant-picker label[data-eu]"
@@ -63,7 +68,7 @@ export async function checkStockOverkill(
 
       return { sizes, found };
     }, targetSize);
-
+    spinner.succeed("[Overkill] Größen geladen!");
     console.log("Sizes:", sizes);
     await handleStockResult({
       found,
@@ -73,13 +78,15 @@ export async function checkStockOverkill(
       shop: SHOP_NAME.Overkill,
     });
   } catch (err) {
+    if (spinner.isSpinning) spinner.fail("[Overkill] Fehler beim Check!");
     logError(`checking ${name}`, err);
   } finally {
-    // 3 Sekunden warten, bevor das Tab geschlossen wird
     await new Promise((res) => setTimeout(res, 3000));
     if (page && !page.isClosed()) {
       try {
         await page.close();
+        spinner.stop();
+        console.log("[Overkill] Tab geschlossen");
       } catch (closeErr) {
         console.warn("Fehler beim Schließen der Seite:", closeErr);
       }

@@ -32,15 +32,16 @@ export async function checkVariantPickerExists({
   name,
   selector = "variant-picker",
   shop = "Overkill",
-}: CheckVariantPickerExistsParams): Promise<boolean> {
+}: CheckVariantPickerExistsParams): Promise<{
+  exists: boolean;
+  logMsg?: string;
+}> {
   const exists = (await page.$(selector)) !== null;
+  let logMsg = undefined;
   if (!exists) {
-    console.log(
-      `❌ All sizes sold out for '${name}' in ${shop}. 🕐 ${new Date().toLocaleString()} \n
-      _________________________________________________________________________________________________`
-    );
+    logMsg = `All sizes SOLD OUT for '${name}' in ${shop}. 🕐 ${new Date().toLocaleString()} \n_________________________________________________________________________________________________`;
   }
-  return exists;
+  return { exists, logMsg };
 }
 
 export function logError(context: string, err: unknown) {

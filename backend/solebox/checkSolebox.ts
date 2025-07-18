@@ -1,3 +1,4 @@
+import ora from "ora";
 import { closeCookieBanner } from "./cookieBannerSolebox.ts";
 import { closeCountryBanner } from "./countryBanner.ts";
 import { Browser } from "puppeteer";
@@ -11,19 +12,27 @@ export async function checkStockSolebox(
 ): Promise<void> {
   const { url, targetSize, name } = item;
   let page;
+  const spinner = ora("\n[Solebox] Lade Produktseite...").start();
 
   try {
-    console.log(`🔍 Checking: ${name}`);
+    console.log(`\n🔍 Checking: ${name}`);
     page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
-    console.log("[Solebox] Tab geöffnet");
+    await page.setViewport({ width: 2560, height: 1440 });
+    spinner.text = "[Solebox] Seite wird geladen...";
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     );
     await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+    await new Promise((res) => setTimeout(res, 3000));
+    spinner.text = "[Solebox] Cookie-Banner wird geschlossen...";
     await closeCookieBanner(page);
+    await new Promise((res) => setTimeout(res, 3000));
+    spinner.text = "[Solebox] Länder-Banner wird geschlossen...";
     await closeCountryBanner(page);
+    await new Promise((res) => setTimeout(res, 3000));
+    spinner.text = "[Solebox] Warte auf Größen-Auswahl...";
     await page.waitForSelector("span.select-size", { timeout: 5000 });
+    await new Promise((res) => setTimeout(res, 3000));
 
     const selectSize = await page.$("span.select-size");
     if (selectSize) {
@@ -74,6 +83,7 @@ export async function checkStockSolebox(
       return { found, sizes };
     }, targetSize);
 
+    spinner.succeed("[Solebox] Größen geladen!");
     console.log("Sizes:", sizes);
 
     await handleStockResult({
@@ -84,11 +94,13 @@ export async function checkStockSolebox(
       shop: SHOP_NAME.Solebox,
     });
   } catch (err) {
+    if (spinner.isSpinning) spinner.fail("[Solebox] Fehler beim Check!");
     logError(`checking ${name}`, err);
   } finally {
     if (page && !page.isClosed()) {
       try {
         await page.close();
+        spinner.stop();
         console.log("[Solebox] Tab geschlossen");
       } catch (closeErr) {
         console.warn("Fehler beim Schließen der Seite:", closeErr);
