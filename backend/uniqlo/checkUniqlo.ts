@@ -32,6 +32,43 @@ export async function checkStockUniqlo(
       timeout: 30000,
     });
 
+    // Warte 2 Sekunden
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Prüfe auf Cookie-Banner und klicke "Alle ablehnen"
+    try {
+      spinner.text = "[Uniqlo] Prüfe auf Cookie-Banner...";
+
+      // Warte kurz auf möglichen Cookie-Banner
+      await page.waitForSelector("#onetrust-reject-all-handler", {
+        timeout: 5000,
+      });
+
+      spinner.text =
+        "[Uniqlo] Cookie-Banner gefunden - lehne alle Cookies ab...";
+      await page.click("#onetrust-reject-all-handler");
+
+      // Warte bis Banner verschwunden ist
+      await page.waitForSelector("#onetrust-banner-sdk", {
+        hidden: true,
+        timeout: 5000,
+      });
+
+      console.log("✅ Cookies abgelehnt");
+    } catch (cookieErr) {
+      // Cookie-Banner nicht gefunden oder bereits behandelt - logge den Fehler
+      console.log(
+        "❌ Cookie-Banner Fehler:",
+        cookieErr instanceof Error ? cookieErr.message : String(cookieErr)
+      );
+      if (spinner.isSpinning)
+        spinner.fail("[Uniqlo] Cookie-Banner konnte nicht behandelt werden!");
+      return; // Beende den Check
+    }
+
+    // Warte 2 Sekunden nach Cookie-Behandlung
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // Warte auf Größen-Container
     spinner.text = "[Uniqlo] Warte auf Größen-Auswahl...";
     await page.waitForSelector(".size-chip-wrapper", { timeout: 10000 });
