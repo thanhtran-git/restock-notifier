@@ -68,43 +68,132 @@ export async function checkStockUniqlo(
       spinner.text = "[Uniqlo] Cookie-Banner bereits behandelt, überspringe...";
     }
 
-    // Warte auf Größen-Container
-    spinner.text = "[Uniqlo] Warte auf Größen-Auswahl...";
-    await page.waitForSelector(".size-chip-wrapper", { timeout: 10000 });
+    // Debug: Screenshot für Deployment-Debugging
+    if (process.env.NODE_ENV === "production") {
+      try {
+        const screenshot = await page.screenshot({ fullPage: true, encoding: 'base64' });
+        console.log("📸 DEBUG SCREENSHOT (Base64 - kopiere in Browser Address Bar):");
+        console.log("data:image/png;base64," + screenshot);
+        console.log("📸 Screenshot Ende");
+      } catch {
+        console.log("⚠️ Screenshot fehlgeschlagen");
+      }
+    }
+
+    // Robuste Größen-Suche mit mehreren Selektoren
+    spinner.text = "[Uniqlo] Warte auf Seitenladevorgang...";
+
+    // Warte länger auf das vollständige Laden der Seite
+    await new Promise((r) => setTimeout(r, 8000));
+
+    spinner.text = "[Uniqlo] Suche nach Größen-Auswahl...";
+
+    // Versuche verschiedene Selektoren
+    const selectors = [
+      ".size-chip-wrapper",
+      "[data-testid*='size']",
+      ".size-selector",
+      ".product-size",
+      "button[class*='size']",
+      ".size-list button",
+    ];
+
+    let foundSelector = null;
+    for (const selector of selectors) {
+      try {
+        await page.waitForSelector(selector, { timeout: 3000 });
+        foundSelector = selector;
+        console.log(`✅ Größen gefunden mit Selektor: ${selector}`);
+        break;
+      } catch {
+        console.log(`❌ Selektor ${selector} nicht gefunden`);
+      }
+    }
+
+    if (!foundSelector) {
+      // Fallback: Analysiere verfügbare Selektoren
+      const availableSelectors = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll("*"))
+          .map((el) => el.className)
+          .filter(
+            (className) =>
+              className &&
+              (className.includes("size") || className.includes("Size"))
+          )
+          .slice(0, 10);
+      });
+
+      console.log("🔍 Verfügbare size-related Klassen:", availableSelectors);
+      throw new Error("Keine Größen-Selektoren gefunden");
+    }
 
     // Kurz warten damit alle Größen geladen sind
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    // Analysiere verfügbare Größen
+    // Analysiere verfügbare Größen mit dem gefundenen Selektor
     spinner.text = "[Uniqlo] Analysiere Größenverfügbarkeit...";
 
-    const { found, sizes } = await page.evaluate((targetSize: string) => {
-      const sizeWrappers = document.querySelectorAll(".size-chip-wrapper");
-      const sizes: string[] = [];
-      let found = false;
+    const { found, sizes } = await page.evaluate(
+      (targetSize: string, selector: string) => {
+        const sizeWrappers = document.querySelectorAll(selector);
+        const sizes: string[] = [];
+        let found = false;
 
-      sizeWrappers.forEach((wrapper) => {
-        // Extrahiere Größentext aus dem Button
-        const sizeElement = wrapper.querySelector("button .typography");
-        const sizeText = sizeElement?.textContent?.trim();
+        console.log(`Gefundene Elemente mit ${selector}:`, sizeWrappers.length);
 
-        if (sizeText) {
-          // Prüfe ob die Größe durchgestrichen ist (ausverkauft)
-          const strikeDiv = wrapper.querySelector("div.strike");
-          const isAvailable = !strikeDiv; // Verfügbar wenn KEIN strike-div vorhanden
+        sizeWrappers.forEach((wrapper, index) => {
+          // Verschiedene Wege, um Größentext zu extrahieren
+          let sizeText = "";
 
-          // Füge zur Liste hinzu
-          sizes.push(`${sizeText}${isAvailable ? "" : " (sold out)"}`);
-
-          // Prüfe ob es die gesuchte Größe ist und verfügbar
-          if (sizeText === targetSize && isAvailable) {
-            found = true;
+          // Methode 1: .typography Klasse
+          const typographyElement =
+            wrapper.querySelector("button .typography") ||
+            wrapper.querySelector(".typography");
+          if (typographyElement) {
+            sizeText = typographyElement.textContent?.trim() || "";
           }
-        }
-      });
 
-      return { found, sizes };
-    }, targetSize);
+          // Methode 2: Direkter Button Text
+          if (!sizeText && wrapper.tagName === "BUTTON") {
+            sizeText = wrapper.textContent?.trim() || "";
+          }
+
+          // Methode 3: Text im Button
+          if (!sizeText) {
+            const buttonElement = wrapper.querySelector("button");
+            if (buttonElement) {
+              sizeText = buttonElement.textContent?.trim() || "";
+            }
+          }
+
+          console.log(`Element ${index}: Text="${sizeText}"`);
+
+          if (sizeText) {
+            // Prüfe ob die Größe durchgestrichen ist (ausverkauft)
+            const strikeDiv =
+              wrapper.querySelector("div.strike") ||
+              wrapper.querySelector(".strike");
+            const buttonElement = wrapper.querySelector(
+              "button"
+            ) as HTMLButtonElement;
+            const isDisabled = buttonElement?.disabled || false;
+            const isAvailable = !strikeDiv && !isDisabled;
+
+            // Füge zur Liste hinzu
+            sizes.push(`${sizeText}${isAvailable ? "" : " (sold out)"}`);
+
+            // Prüfe ob es die gesuchte Größe ist und verfügbar
+            if (sizeText === targetSize && isAvailable) {
+              found = true;
+            }
+          }
+        });
+
+        return { found, sizes };
+      },
+      targetSize,
+      foundSelector
+    );
 
     spinner.succeed("[Uniqlo] Größen erfolgreich analysiert!");
     console.log("Verfügbare Größen:", sizes);

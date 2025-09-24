@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev": "node server.ts",
+    "test-deployment": "node test-deployment.js",
+    "debug-uniqlo": "node -e \"process.env.NODE_ENV='production'; require('./backend/uniqlo/testUniqlo.ts')\""
+  }
+}
