@@ -28,11 +28,19 @@ export async function checkAllItems(): Promise<void> {
     [SHOP_NAME.Uniqlo.toLowerCase()]: (item) => checkStockUniqlo(item, browser),
   };
 
+  let isFirstUniqloCheck = true;
+
   try {
     for (const item of items) {
       const checker = shopDispatch[item.shop.toLowerCase()];
       if (checker) {
-        await checker(item);
+        // Für Uniqlo: Übergebe isFirstUniqloCheck Parameter
+        if (item.shop.toLowerCase() === SHOP_NAME.Uniqlo.toLowerCase()) {
+          await checkStockUniqlo(item, browser, isFirstUniqloCheck);
+          isFirstUniqloCheck = false; // Nach dem ersten Check auf false setzen
+        } else {
+          await checker(item);
+        }
       } else {
         console.warn(`⚠️ Unknown shop: ${item.shop}`);
       }
