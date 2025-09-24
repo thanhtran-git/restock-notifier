@@ -33,8 +33,7 @@ export async function checkStockUniqlo(
       timeout: 30000,
     });
 
-    // Warte 2 Sekunden
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Prüfe auf Cookie-Banner nur beim ersten Check
     if (isFirstCheck) {
@@ -58,19 +57,13 @@ export async function checkStockUniqlo(
         });
 
         console.log("✅ Cookies abgelehnt - gilt für alle weiteren Checks");
-      } catch (cookieErr) {
-        // Cookie-Banner nicht gefunden oder bereits behandelt - logge den Fehler
-        console.log(
-          "❌ Cookie-Banner Fehler:",
-          cookieErr instanceof Error ? cookieErr.message : String(cookieErr)
-        );
-        if (spinner.isSpinning)
-          spinner.fail("[Uniqlo] Cookie-Banner konnte nicht behandelt werden!");
-        return; // Beende den Check
+      } catch {
+        // Cookie-Banner nicht gefunden oder bereits behandelt - das ist normal auf manchen Deployments
+        console.log("ℹ️ Kein Cookie-Banner gefunden - fahre mit Check fort");
       }
 
-      // Warte 2 Sekunden nach Cookie-Behandlung
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Warte 5 Sekunden nach Cookie-Behandlung
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     } else {
       spinner.text = "[Uniqlo] Cookie-Banner bereits behandelt, überspringe...";
     }
