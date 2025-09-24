@@ -1,6 +1,7 @@
 import { checkStockVoostore } from "./voostore/checkVoostore.ts";
 import { checkStockOverkill } from "./overkill/checkOverkill.ts";
 import { checkStockSolebox } from "./solebox/checkSolebox.ts";
+import { checkStockUniqlo } from "./uniqlo/checkUniqlo.ts";
 import { ITEMS_TO_MONITOR } from "./config.ts";
 import type { ItemToMonitor } from "../types.ts";
 import { SHOP_NAME } from "../types.ts";
@@ -24,6 +25,8 @@ export async function checkAllItems(): Promise<void> {
       checkStockOverkill(item, browser),
     [SHOP_NAME.Solebox.toLowerCase()]: (item) =>
       checkStockSolebox(item, browser),
+    [SHOP_NAME.Uniqlo.toLowerCase()]: (item) =>
+      checkStockUniqlo(item, browser),
   };
 
   try {

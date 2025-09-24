@@ -1,4 +1,4 @@
-export type Shop = "voostore" | "overkill";
+export type Shop = "voostore" | "overkill" | "uniqlo";
 
 export interface ItemToMonitor {
   url: string;
@@ -26,4 +26,5 @@ export const SHOP_NAME = {
   Voostore: "Voostore",
   Overkill: "Overkill",
   Solebox: "Solebox",
+  Uniqlo: "Uniqlo",
 } as const;
