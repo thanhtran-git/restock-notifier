@@ -71,8 +71,13 @@ export async function checkStockUniqlo(
     // Debug: Screenshot für Deployment-Debugging
     if (process.env.NODE_ENV === "production") {
       try {
-        const screenshot = await page.screenshot({ fullPage: true, encoding: 'base64' });
-        console.log("📸 DEBUG SCREENSHOT (Base64 - kopiere in Browser Address Bar):");
+        const screenshot = await page.screenshot({
+          fullPage: true,
+          encoding: "base64",
+        });
+        console.log(
+          "📸 DEBUG SCREENSHOT (Base64 - kopiere in Browser Address Bar):"
+        );
         console.log("data:image/png;base64," + screenshot);
         console.log("📸 Screenshot Ende");
       } catch {
