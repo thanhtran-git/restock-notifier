@@ -38,7 +38,13 @@ export async function checkAllItems(): Promise<void> {
         console.warn(`⚠️ Unknown shop: ${item.shop}`);
       }
     }
+    
+    console.log("\n✅ Alle Checks abgeschlossen!");
+  } catch (error) {
+    console.error("\n❌ Fehler beim Stock-Check:", error);
   } finally {
+    console.log("🔒 Browser wird geschlossen...");
     await browser.close();
+    console.log("✅ Browser geschlossen. Check-Vorgang beendet.\n");
   }
 }

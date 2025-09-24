@@ -88,8 +88,8 @@ export async function checkStockUniqlo(
     if (spinner.isSpinning) spinner.stop();
     console.log("");
     console.log(`[Uniqlo] ${name} - Check abgeschlossen (Tab bleibt offen)`);
-  }
 
-  // Nach jedem Check mindestens 3 Sekunden warten
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Nach jedem Check mindestens 3 Sekunden warten (nur wenn nicht letzter Check)
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
 }
